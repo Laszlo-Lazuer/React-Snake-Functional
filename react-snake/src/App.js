@@ -57,11 +57,25 @@ const getSnakeWithoutStub = (snake) =>
 const getIsSnakeEating = ({ snake, snack }) =>
   isPosition(getSnakeHead(snake).x, getSnakeHead(snake).y, snack.coordinate.x, snack.coordinate.y);
 
-const getCellCS = (snake, snack, x,y) =>
-  cs('grid-cell', {
-    'grid-cell-border': isBorder(x,y),
-    'grid-cell-snake': isSnake(x,y, snake.coordinates),
+const getSnakeTail = (snake) =>
+  snake.coordinates.slice(1);
+
+const getIsSnakeClumsy = (snake) =>
+  isSnake(getSnakeHead(snake).x, getSnakeHead(snake).y, getSnakeTail(snake));
+
+const getIsSnakeOutside = (snake) =>
+  getSnakeHead(snake).x >= GRID_SIZE ||
+  getSnakeHead(snake).y >= GRID_SIZE ||
+  getSnakeHead(snake).x <= 0 ||
+  getSnakeHead(snake).y <= 0;
+
+const getCellCS = (isGameOver, snake, snack, x,y) =>
+  cs('grid-cell',
+  {
+    'grid-cell-border': isBorder(x, y),
+    'grid-cell-snake': isSnake(x, y, snake.coordinates),
     'grid-cell-snack': isPosition(x, y, snack.coordinate.x, snack.coordinate.y),
+    'grid-cell-hit': isGameOver && isPosition(x, y, getSnakeHead(snake).x, getSnakeHead(snake).y),
   });
 
   const doChangeDIrection = (direction) => () => ({
@@ -70,7 +84,13 @@ const getCellCS = (snake, snack, x,y) =>
     }
   });
 
-  const applySnakePosition = prevState => {
+  const applyGameOver = (prevState) => ({
+    playground: {
+        isGameOver: true,
+      },
+  })
+
+  const applySnakePosition = (prevState) => {
     const isSnakeEating = getIsSnakeEating(prevState);
 
     const snakeHead = DIRECTION_TICKS[prevState.playground.direction](
@@ -127,7 +147,9 @@ class App extends Component {
 
   onTick = () => {
     //Move snake
-    this.setState(applySnakePosition);
+    getIsSnakeOutside(this.state.snake) || getIsSnakeClumsy(this.state.snake)
+      ? this.setState(applyGameOver)
+      : this.setState(applySnakePosition);
   }
 
   onChangeDirection = (event) => {
@@ -141,6 +163,7 @@ class App extends Component {
     const {
       snake,
       snack,
+      playground,
     } = this.state;
     return (
       <div className="app">
@@ -148,13 +171,14 @@ class App extends Component {
       <Grid
         snake={snake}
         snack={snack}
+        isGameOver={playground.isGameOver}
         />
       </div>
     );
   }
 }
 
-const Grid = ({snake, snack}) =>
+const Grid = ({ isGameOver, snake, snack }) =>
 <div>
   {GRID.map(y =>
     <Row
@@ -162,11 +186,12 @@ const Grid = ({snake, snack}) =>
       key={y}
       snake={snake}
       snack={snack}
+      isGameOver={isGameOver}
       />
   )}
 </div>
 
-const Row = ({ snake, snack, y }) =>
+const Row = ({ isGameOver, snake, snack, y }) =>
   <div className="grid-row">
     {GRID.map(x =>
       <Cell
@@ -175,12 +200,13 @@ const Row = ({ snake, snack, y }) =>
         key={x}
         snake={snake}
         snack={snack}
+        isGameOver={isGameOver}
       />
     )}
   </div>
 
-  const Cell = ({ snake, snack, x,y }) =>
-    <div className={getCellCS(snake, snack, x,y)} />
+  const Cell = ({ isGameOver, snake, snack, x,y }) =>
+    <div className={getCellCS(isGameOver, snake, snack, x, y)} />
 
 
 export default App;
