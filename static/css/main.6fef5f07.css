@@ -1,0 +1,2 @@
+body{margin:0;padding:0;font-family:sans-serif}.app{-ms-flex-direction:column;flex-direction:column;-ms-flex-align:center;align-items:center}.app,.grid-row{display:-ms-flexbox;display:flex}.grid-row{-ms-flex-direction:row;flex-direction:row}.grid-cell{width:15px;height:15px;border-top:1px solid #000;border-left:1px solid #000}.grid-cell-border,.grid-cell-snack,.grid-cell-snake{background-color:#000}.grid-cell-hit{background-color:red}
+/*# sourceMappingURL=main.6fef5f07.css.map*/
