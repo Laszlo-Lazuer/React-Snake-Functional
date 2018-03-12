@@ -1,0 +1,22 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.grid-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.grid-cell {
+  width: 15px;
+  height: 15px;
+
+  border-top: 1px solid #000;
+  border-left: 1px solid #000;
+}
+
+.grid-cell-border {
+  background-color: #000;
+}
